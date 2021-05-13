@@ -2,6 +2,11 @@ let tabMax = 10;
 let archiveTabMax = 10;
 let deletedTabs = [];
 
+function updateBadge() {
+  const badgeValue = deletedTabs.length === 0 ? '' : String(deletedTabs.length);
+  chrome.action.setBadgeText({ text: badgeValue });
+}
+
 async function updateTabs(newTab) {
   const tabs = await chrome.tabs.query({});
   const numTabsToRemove = tabs.length - tabMax;
@@ -16,9 +21,9 @@ async function updateTabs(newTab) {
       deletedTabs = deletedTabs.slice(0, archiveTabMax);
     }
     chrome.storage.local.set({ deletedTabs });
-    const badgeValue = deletedTabs.length === 0 ? '' : String(deletedTabs.length);
-    chrome.action.setBadgeText({ text: badgeValue });
   }
+
+  updateBadge();
 }
 
 chrome.storage.sync.get(['tabLimit', 'archivedTabLimit'], ({ tabLimit, archivedTabLimit }) => {
@@ -44,4 +49,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 chrome.storage.local.get('deletedTabs', ({ deletedTabs: deletedTabsLocal = [] }) => {
   deletedTabs = deletedTabsLocal;
+  updateBadge();
 });
