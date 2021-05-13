@@ -11,12 +11,23 @@ function init() {
       tabLimit = tabLimit < 1 ? 1 : tabLimit;
       chrome.storage.sync.set({ tabLimit });
     }
+
+    let archivedTabLimit = document.getElementById('archivedTabLimit').value;
+    if (!isNaN(archivedTabLimit)) {
+      archivedTabLimit = Number(archivedTabLimit);
+      archivedTabLimit = archivedTabLimit > 50 ? 50 : archivedTabLimit;
+      archivedTabLimit = archivedTabLimit < 1 ? 1 : archivedTabLimit;
+      chrome.storage.sync.set({ archivedTabLimit });
+    }
+
     window.close();
   });
 
-  chrome.storage.sync.get('tabLimit', ({ tabLimit }) => {
+  chrome.storage.sync.get(['tabLimit', 'archivedTabLimit'], ({ tabLimit, archivedTabLimit }) => {
     const tabLimitElement = document.getElementById('tabLimit');
-    tabLimitElement.value = tabLimit;
+    tabLimitElement.value = tabLimit || 10;
+    const archivedTabLimitElement = document.getElementById('archivedTabLimit');
+    archivedTabLimitElement.value = archivedTabLimit || 10;
   });
 
   chrome.runtime.sendMessage('get_deleted_tabs', ({ deletedTabs }) => {

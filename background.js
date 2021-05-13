@@ -1,4 +1,5 @@
 let tabMax = 10;
+let archiveTabMax = 10;
 let deletedTabs = [];
 
 async function updateTabs(newTab) {
@@ -9,26 +10,29 @@ async function updateTabs(newTab) {
     const tabsToRemove = tabs.filter((tab, index) => index < numTabsToRemove);
     const tabIdsToRemove = tabsToRemove.map(tab => tab.id);
     chrome.tabs.remove(tabIdsToRemove);
-    deletedTabs.push(...tabsToRemove.filter(tab => !tab.url?.startsWith('chrome:') && !deletedTabs.find(deletedTab => deletedTab.url === tab.url)));
+    deletedTabs.unshift(...tabsToRemove.filter(tab => !tab.url?.startsWith('chrome:') && !deletedTabs.find(deletedTab => deletedTab.url === tab.url)));
     deletedTabs = deletedTabs.filter(deletedTab => deletedTab.url !== newTab?.pendingUrl);
-    // chrome.storage.local.set({ deletedTabs });
+    if (deletedTabs.length > archiveTabMax) {
+      deletedTabs = deletedTabs.slice(0, archiveTabMax);
+    }
+    chrome.storage.local.set({ deletedTabs });
     const badgeValue = deletedTabs.length === 0 ? '' : String(deletedTabs.length);
     chrome.action.setBadgeText({ text: badgeValue });
-  } else {
-    chrome.action.setBadgeText({ text: '' });
   }
 }
 
-chrome.storage.sync.get('tabLimit', ({ tabLimit }) => {
+chrome.storage.sync.get(['tabLimit', 'archivedTabLimit'], ({ tabLimit, archivedTabLimit }) => {
   tabMax = tabLimit;
+  archiveTabMax = archivedTabLimit;
 });
 
 chrome.tabs.onCreated.addListener(async (newTab) => {
   updateTabs(newTab);
 });
 
-chrome.storage.onChanged.addListener(async ({ tabLimit }) => {
-  tabMax = tabLimit.newValue;
+chrome.storage.onChanged.addListener(async ({ tabLimit, archivedTabLimit }) => {
+  tabMax = tabLimit?.newValue || tabMax;
+  archiveTabMax = archivedTabLimit?.newValue || archiveTabMax;
   updateTabs();
 });
 
@@ -38,6 +42,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// chrome.storage.local.get('deletedTabs', ({ deletedTabs: deletedTabsLocal = [] }) => {
-//   deletedTabs = deletedTabsLocal;
-// });
+chrome.storage.local.get('deletedTabs', ({ deletedTabs: deletedTabsLocal = [] }) => {
+  deletedTabs = deletedTabsLocal;
+});
