@@ -7,9 +7,10 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "options.html"
+    "default_popup": "popup.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ]
 }
