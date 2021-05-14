@@ -1,3 +1,5 @@
+let deletedTabsLocal = [];
+
 function init() {
   const saveButton = document.getElementById('save');
 
@@ -16,6 +18,10 @@ function init() {
       archivedTabLimit = archivedTabLimit > 99 ? 99 : archivedTabLimit;
       archivedTabLimit = archivedTabLimit < 1 ? 1 : archivedTabLimit;
       chrome.storage.sync.set({ archivedTabLimit });
+    }
+
+    if (deletedTabsLocal.length > archivedTabLimit) {
+      chrome.storage.local.set({ deletedTabs: deletedTabsLocal.slice(0, archivedTabLimit) });
     }
 
     window.close();
@@ -51,6 +57,8 @@ function init() {
         chrome.storage.local.set({ deletedTabs });
       });
     }
+
+    deletedTabsLocal = deletedTabs;
   });
 }
 
