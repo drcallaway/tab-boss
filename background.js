@@ -41,12 +41,6 @@ chrome.storage.onChanged.addListener(async ({ tabLimit, archivedTabLimit }) => {
   updateTabs();
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request === 'get_deleted_tabs') {
-    sendResponse({ deletedTabs });
-  }
-});
-
 chrome.storage.local.get('deletedTabs', ({ deletedTabs: deletedTabsLocal = [] }) => {
   deletedTabs = deletedTabsLocal;
   updateBadge();

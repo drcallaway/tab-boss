@@ -30,7 +30,7 @@ function init() {
     archivedTabLimitElement.value = archivedTabLimit || 10;
   });
 
-  chrome.runtime.sendMessage('get_deleted_tabs', ({ deletedTabs }) => {
+  chrome.storage.local.get('deletedTabs', ({ deletedTabs = [] }) => {
     const deletedTabList = document.getElementById('deletedTabList');
 
     for (const tab of deletedTabs) {
