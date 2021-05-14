@@ -5,7 +5,7 @@ function init() {
 
   saveButton.addEventListener('click', () => {
     let tabLimit = document.getElementById('tabLimit').value;
-    if (!isNaN(tabLimit)) {
+    if (!Number.isFinite(tabLimit)) {
       tabLimit = Number(tabLimit);
       tabLimit = tabLimit > 50 ? 50 : tabLimit;
       tabLimit = tabLimit < 1 ? 1 : tabLimit;
@@ -13,7 +13,7 @@ function init() {
     }
 
     let archivedTabLimit = document.getElementById('archivedTabLimit').value;
-    if (!isNaN(archivedTabLimit)) {
+    if (!Number.isFinite(archivedTabLimit)) {
       archivedTabLimit = Number(archivedTabLimit);
       archivedTabLimit = archivedTabLimit > 50 ? 50 : archivedTabLimit;
       archivedTabLimit = archivedTabLimit < 1 ? 1 : archivedTabLimit;
