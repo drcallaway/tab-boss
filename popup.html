@@ -5,11 +5,15 @@
     <script src="popup.js"></script>
   </head>
   <body>
-    <p>Maximum number of visible tabs: <input type="text" id="tabLimit" maxlength="2" class="inputBox" value="10"></p>
-    <p>Maximum number of archived tabs: <input type="text" id="archivedTabLimit" maxlength="2" class="inputBox" value="10"></p>
+    <h1>Tab Boss</h1>
     <p>
-      <button id="save">Save</button>
+      <span>Maximum number of visible tabs: <input type="text" id="tabLimit" maxlength="2" class="inputBox" value="10"></span>
+      <span class="padLeft10">Maximum number of archived tabs: <input type="text" id="archivedTabLimit" maxlength="2" class="inputBox" value="50"></span>
     </p>
-    <ul id="deletedTabList"/>
+    <p>
+      <button id="save">Save Changes</button>
+      <button id="clear" class="padLeft3">Clear History</button>
+    </p>
+    <ul id="deletedTabList" class="tabList">
   </body>
 </html>

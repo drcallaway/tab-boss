@@ -1,7 +1,32 @@
 body {
-  width: 400px;
+  width: 500px;
 }
 
 .inputBox {
   width: 20px;
+}
+
+.tabList {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.tabItem {
+  border: solid blue;
+  border-width: 1px 1px 1px 5px;
+  margin: 5px 0;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tabItem:hover {
+  background: #eee;
+}
+
+.padLeft10 {
+  margin-left: 10px;
+}
+
+.padLeft3 {
+  margin-left: 3px;
 }

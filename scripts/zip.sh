@@ -1,0 +1,1 @@
+cd .. && zip -r tab-boss.zip . --exclude=*.git* --exclude=*.zip* --exclude=*scripts* --exclude=*README.md*

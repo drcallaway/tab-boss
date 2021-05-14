@@ -1,6 +1,6 @@
 {
   "name": "Tab Boss",
-  "description": "Simple tab manager for Chromium browsers",
+  "description": "Simple tab manager",
   "version": "1.0",
   "manifest_version": 3,
   "background": {
@@ -12,5 +12,11 @@
   "permissions": [
     "storage",
     "tabs"
-  ]
+  ],
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  }
 }

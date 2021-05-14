@@ -1,5 +1,8 @@
-let tabMax = 10;
-let archiveTabMax = 10;
+const DEFAULT_TAB_LIMIT = 10;
+const DEFAULT_ARCHIVE_TAB_LIMIT = 50;
+
+let tabMax;
+let archiveTabMax;
 let deletedTabs = [];
 
 function updateBadge() {
@@ -27,17 +30,22 @@ async function updateTabs(newTab) {
 }
 
 chrome.storage.sync.get(['tabLimit', 'archivedTabLimit'], ({ tabLimit, archivedTabLimit }) => {
-  tabMax = tabLimit;
-  archiveTabMax = archivedTabLimit;
+  tabMax = tabLimit || DEFAULT_TAB_LIMIT;
+  archiveTabMax = archivedTabLimit || DEFAULT_ARCHIVE_TAB_LIMIT;
+
+  if (!tabLimit || !archivedTabLimit) {
+    chrome.storage.sync.set({ tabLimit: tabMax, archivedTabLimit: archiveTabMax });
+  }
 });
 
 chrome.tabs.onCreated.addListener(async (newTab) => {
   updateTabs(newTab);
 });
 
-chrome.storage.onChanged.addListener(async ({ tabLimit, archivedTabLimit }) => {
+chrome.storage.onChanged.addListener(async ({ tabLimit, archivedTabLimit, deletedTabs: deleteTabsLocal = [] }) => {
   tabMax = tabLimit?.newValue || tabMax;
   archiveTabMax = archivedTabLimit?.newValue || archiveTabMax;
+  deletedTabs = deleteTabsLocal?.newValue || deletedTabs;
   updateTabs();
 });
 
