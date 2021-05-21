@@ -10,19 +10,21 @@ function updateBadge() {
   chrome.action.setBadgeText({ text: badgeValue });
 }
 
-async function updateTabs({ newTab, tabId }) {
+async function updateTabs(unpinned) {
   const tabs = await chrome.tabs.query({ pinned: false, currentWindow: true });
   const numTabsToRemove = tabs.length - tabMax;
 
   if (numTabsToRemove > 0) {
-    if (tabId) {
+    if (unpinned) {
       // swap first and second tab locations so that newly unpinned tab isn't immediately removed
       [tabs[0], tabs[1]] = [tabs[1], tabs[0]];
     }
     const tabsToRemove = tabs.filter((tab, index) => index < numTabsToRemove);
     const tabIdsToRemove = tabsToRemove.map(tab => tab.id);
     chrome.tabs.remove(tabIdsToRemove);
-    deletedTabs = deletedTabs.filter(deletedTab => deletedTab.url !== newTab?.pendingUrl && !tabsToRemove.find(tab => deletedTab.url === tab.url));
+    // remove duplicate archived tabs
+    deletedTabs = deletedTabs.filter(deletedTab => !tabsToRemove.find(tab => deletedTab.url === tab.url && deletedTab.title === tab.title));
+    // add newly removed tabs to top of the archived tabs list
     deletedTabs.unshift(...tabsToRemove.filter(tab => !tab.url?.startsWith('chrome:')));
     if (deletedTabs.length > archiveTabMax) {
       deletedTabs = deletedTabs.slice(0, archiveTabMax);
@@ -43,14 +45,14 @@ function initEventHandlers() {
     }
   });
 
-  chrome.tabs.onCreated.addListener(async (newTab) => {
-    updateTabs({ newTab });
+  chrome.tabs.onCreated.addListener(async () => {
+    updateTabs();
+  });
 
-    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-      if (changeInfo.pinned === false) {
-        updateTabs({ tabId });
-      }
-    });
+  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+    if (changeInfo.pinned === false) {
+      updateTabs(true);
+    }
   });
 
   chrome.storage.onChanged.addListener(async ({ tabLimit, archivedTabLimit, deletedTabs: deleteTabsLocal = [] }) => {
