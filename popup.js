@@ -1,3 +1,6 @@
+const MAX_TAB_LIMIT = 50;
+const MAX_ARCHIVE_TAB_LIMIT = 99;
+
 let deletedTabsLocal = [];
 
 function initSaveButton() {
@@ -7,7 +10,7 @@ function initSaveButton() {
     let tabLimit = document.getElementById('tabLimit').value;
     if (!Number.isFinite(tabLimit)) {
       tabLimit = Number(tabLimit);
-      tabLimit = tabLimit > 50 ? 50 : tabLimit;
+      tabLimit = tabLimit > MAX_TAB_LIMIT ? MAX_TAB_LIMIT : tabLimit;
       tabLimit = tabLimit < 1 ? 1 : tabLimit;
       chrome.storage.sync.set({ tabLimit });
     }
@@ -15,7 +18,7 @@ function initSaveButton() {
     let archivedTabLimit = document.getElementById('archivedTabLimit').value;
     if (!Number.isFinite(archivedTabLimit)) {
       archivedTabLimit = Number(archivedTabLimit);
-      archivedTabLimit = archivedTabLimit > 99 ? 99 : archivedTabLimit;
+      archivedTabLimit = archivedTabLimit > MAX_ARCHIVE_TAB_LIMIT ? MAX_ARCHIVE_TAB_LIMIT : archivedTabLimit;
       archivedTabLimit = archivedTabLimit < 1 ? 1 : archivedTabLimit;
       chrome.storage.sync.set({ archivedTabLimit });
     }

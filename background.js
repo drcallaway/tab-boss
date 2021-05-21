@@ -10,26 +10,26 @@ function updateBadge() {
   chrome.action.setBadgeText({ text: badgeValue });
 }
 
-async function updateTabs(unpinned) {
+async function updateTabs({ newTab, unpinnedTabId } = {}) {
   const tabs = await chrome.tabs.query({ pinned: false, currentWindow: true });
   const numTabsToRemove = tabs.length - tabMax;
 
   if (numTabsToRemove > 0) {
-    if (unpinned) {
+    if (unpinnedTabId) {
       // swap first and second tab locations so that newly unpinned tab isn't immediately removed
       [tabs[0], tabs[1]] = [tabs[1], tabs[0]];
     }
     const tabsToRemove = tabs.filter((tab, index) => index < numTabsToRemove);
     const tabIdsToRemove = tabsToRemove.map(tab => tab.id);
-    chrome.tabs.remove(tabIdsToRemove);
+    await chrome.tabs.remove(tabIdsToRemove);
     // remove duplicate archived tabs
-    deletedTabs = deletedTabs.filter(deletedTab => !tabsToRemove.find(tab => deletedTab.url === tab.url && deletedTab.title === tab.title));
+    deletedTabs = deletedTabs.filter(deletedTab => (deletedTab.url !== newTab?.pendingUrl || deletedTab.title === newTab?.title) && !tabsToRemove.find(tab => deletedTab.url === tab.url && deletedTab.title === tab.title));
     // add newly removed tabs to top of the archived tabs list
-    deletedTabs.unshift(...tabsToRemove.filter(tab => !tab.url?.startsWith('chrome:')));
+    deletedTabs.unshift(...tabsToRemove.filter(tab => !tab.url?.startsWith('chrome://newtab/')));
     if (deletedTabs.length > archiveTabMax) {
       deletedTabs = deletedTabs.slice(0, archiveTabMax);
     }
-    chrome.storage.local.set({ deletedTabs });
+    await chrome.storage.local.set({ deletedTabs });
   }
 
   updateBadge();
@@ -45,13 +45,13 @@ function initEventHandlers() {
     }
   });
 
-  chrome.tabs.onCreated.addListener(async () => {
-    updateTabs();
+  chrome.tabs.onCreated.addListener(async (newTab) => {
+    updateTabs({ newTab });
   });
 
   chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
     if (changeInfo.pinned === false) {
-      updateTabs(true);
+      updateTabs({ unpinnedTabId: tabId });
     }
   });
 
@@ -72,3 +72,4 @@ function initEventHandlers() {
 }
 
 initEventHandlers();
+updateTabs();
