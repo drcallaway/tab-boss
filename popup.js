@@ -1,6 +1,6 @@
 let deletedTabsLocal = [];
 
-function init() {
+function initSaveButton() {
   const saveButton = document.getElementById('save');
 
   saveButton.addEventListener('click', () => {
@@ -26,21 +26,27 @@ function init() {
 
     window.close();
   });
+}
 
+function initClearButton() {
   const clearButton = document.getElementById('clear');
 
   clearButton.addEventListener('click', () => {
     chrome.storage.local.set({ deletedTabs: [] });
     window.close();
   });
+}
 
+function initSettings() {
   chrome.storage.sync.get(['tabLimit', 'archivedTabLimit'], ({ tabLimit, archivedTabLimit }) => {
     const tabLimitElement = document.getElementById('tabLimit');
     tabLimitElement.value = tabLimit;
     const archivedTabLimitElement = document.getElementById('archivedTabLimit');
     archivedTabLimitElement.value = archivedTabLimit;
   });
+}
 
+function initHistory() {
   chrome.storage.local.get('deletedTabs', ({ deletedTabs = [] }) => {
     const deletedTabList = document.getElementById('deletedTabList');
 
@@ -62,4 +68,11 @@ function init() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+function initPopup() {
+  initSaveButton();
+  initClearButton();
+  initSettings();
+  initHistory();
+}
+
+document.addEventListener('DOMContentLoaded', initPopup);
