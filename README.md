@@ -1,2 +1,3 @@
 # tab-boss
-Tab manager for Chromium browsers
+
+Tab Boss is an open source browser extension for managing tabs in Chrome.
